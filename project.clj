@@ -1,7 +1,7 @@
-(defproject com.stuartsierra/dependency "0.1.2-SNAPSHOT"
+(defproject kibu/dependency-cljx "0.1.2-SNAPSHOT"
   :description "A data structure for representing dependency graphs"
-  :url "https://github.com/stuartsierra/dependency"
-  :license {:name "Eclipse Publi   c License"
+  :url "https://github.com/kibu-australia/dependency"
+  :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.7.0-alpha3"]
                                   [org.clojure/clojurescript "0.0-2268"]]}}
