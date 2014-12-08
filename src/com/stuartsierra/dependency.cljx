@@ -56,7 +56,7 @@
 (def ^:private set-conj (fnil conj #{}))
 
 ;; Do not construct directly, use 'graph' function
-(deftype MapDependencyGraph [dependencies dependents]
+(defrecord MapDependencyGraph [dependencies dependents]
   DependencyGraph
   (immediate-dependencies [graph node]
     (get dependencies node #{}))
@@ -72,8 +72,10 @@
   DependencyGraphUpdate
   (depend [graph node dep]
     (when (or (= node dep) (depends? graph dep node))
-      (throw (Exception. (str "Circular dependency between "
-                              (pr-str node) " and " (pr-str dep)))))
+      (throw (#+clj Exception. 
+              #+cljs js/Error. 
+              (str "Circular dependency between "
+                   (pr-str node) " and " (pr-str dep)))))
     (MapDependencyGraph.
      (update-in dependencies [node] set-conj dep)
      (update-in dependents [dep] set-conj node)))
@@ -141,5 +143,7 @@
   [graph]
   (let [pos (zipmap (topo-sort graph) (range))]
     (fn [a b]
-      (compare (get pos a Long/MAX_VALUE)
-               (get pos b Long/MAX_VALUE)))))
+      (compare (get pos a #+clj Long/MAX_VALUE
+                          #+cljs (.-MAX_VALUE js/Number))
+               (get pos b #+clj Long/MAX_VALUE
+                          #+cljs (.-MAX_VALUE js/Number))))))

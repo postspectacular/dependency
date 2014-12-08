@@ -1,6 +1,14 @@
 (ns com.stuartsierra.dependency-test
-  (:use clojure.test
-        com.stuartsierra.dependency))
+  #+cljs (:require-macros [cemerick.cljs.test :refer [deftest is]])
+  (:require 
+        #+clj [clojure.test :as test :refer [deftest is run-tests]]
+        #+cljs [cemerick.cljs.test :as test]
+        [com.stuartsierra.dependency :refer [graph
+                                             topo-sort
+                                             transitive-dependencies
+                                             transitive-dependents
+                                             depend 
+                                             topo-comparator]]))
 
 ;; building a graph like:
 ;;
@@ -56,22 +64,24 @@
 (deftest t-topo-comparator
   (is (= '(:a :b :d :foo)
          (sort (topo-comparator g1) [:d :a :b :foo])))
-  (is (= '(three five seven nine eight)
+  (is (= '(five three seven nine eight)
          (sort (topo-comparator g2) '[three seven nine eight five]))))
 
 (deftest t-topo-sort
-  (is (= '(one two three five six four seven)
+  (is (= '(one two five four three six seven)
          (topo-sort g2))))
 
 (deftest t-no-cycles
-  (is (thrown? Exception
+  (is (thrown? #+clj Exception
+               #+cljs js/Error
                (-> (graph)
                    (depend :a :b)
                    (depend :b :c)
                    (depend :c :a)))))
 
 (deftest t-no-self-cycles
-  (is (thrown? Exception
+  (is (thrown? #+clj Exception
+               #+cljs js/Error
                (-> (graph)
                    (depend :a :b)
                    (depend :a :a)))))
