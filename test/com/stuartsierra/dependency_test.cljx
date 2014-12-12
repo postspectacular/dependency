@@ -1,14 +1,14 @@
 (ns com.stuartsierra.dependency-test
   #+cljs (:require-macros [cemerick.cljs.test :refer [deftest is]])
-  (:require 
-        #+clj [clojure.test :as test :refer [deftest is run-tests]]
-        #+cljs [cemerick.cljs.test :as test]
-        [com.stuartsierra.dependency :refer [graph
-                                             topo-sort
-                                             transitive-dependencies
-                                             transitive-dependents
-                                             depend 
-                                             topo-comparator]]))
+  #+cljs (:require [cemerick.cljs.test :as test]
+                   [com.stuartsierra.dependency :refer [graph
+                                                        depend
+                                                        topo-sort
+                                                        transitive-dependencies
+                                                        transitive-dependents
+                                                        topo-comparator]])
+  #+clj (:use clojure.test
+              com.stuartsierra.dependency))
 
 ;; building a graph like:
 ;;
@@ -64,12 +64,28 @@
 (deftest t-topo-comparator
   (is (= '(:a :b :d :foo)
          (sort (topo-comparator g1) [:d :a :b :foo])))
-  (is (= '(five three seven nine eight)
-         (sort (topo-comparator g2) '[three seven nine eight five]))))
+  (is (or (= '(three five seven nine eight)
+             (sort (topo-comparator g2) '[three seven nine eight five]))
 
+          (= '(five three seven nine eight)
+             (sort (topo-comparator g2) '[three seven nine eight five])))))
+
+;; Topological sorting is not unique when no Hamiltonian path exists
+;; Therefore each of these orders is a valid topological sort
+;;
+;; Clojure 1.6, 1.5.1, Clojurescript all return different results for topo-sort
 (deftest t-topo-sort
-  (is (= '(one two five four three six seven)
-         (topo-sort g2))))
+  (is (or (= '(one two three five six four seven)
+             (topo-sort g2))
+
+          (= '(one two three six five four seven)
+             (topo-sort g2))
+
+          (= '(one two five three four six seven)
+             (topo-sort g2))
+
+          (= '(one two five four three six seven)
+             (topo-sort g2)))))
 
 (deftest t-no-cycles
   (is (thrown? #+clj Exception

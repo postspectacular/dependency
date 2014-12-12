@@ -72,8 +72,8 @@
   DependencyGraphUpdate
   (depend [graph node dep]
     (when (or (= node dep) (depends? graph dep node))
-      (throw (#+clj Exception. 
-              #+cljs js/Error. 
+      (throw (#+clj Exception.
+              #+cljs js/Error.
               (str "Circular dependency between "
                    (pr-str node) " and " (pr-str dep)))))
     (MapDependencyGraph.
