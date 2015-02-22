@@ -1,4 +1,4 @@
-(defproject kibu/dependency "0.1.2-SNAPSHOT"
+(defproject com.postspectacular/dependency "0.1.2"
   :description "A data structure for representing dependency graphs"
   :url "https://github.com/kibu-australia/dependency"
   :license {:name "Eclipse Public License"
@@ -11,13 +11,16 @@
             "test" ["do" "clean," "cljx" "once," "test," "with-profile" "dev" "cljsbuild" "test"]}
 
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
-                                  [org.clojure/clojurescript "0.0-2411"]]
+                                  [org.clojure/clojurescript "0.0-2913"]]
 
-                   :plugins [[com.keminglabs/cljx "0.4.0"]
-                             [lein-cljsbuild "1.0.3"]
-                             [com.cemerick/clojurescript.test "0.3.1"]]
+                   :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"]
+                             [lein-cljsbuild "1.0.4"]
+                             [com.cemerick/clojurescript.test "0.3.3"]]
 
-                   :hooks [cljx.hooks]
+                   :global-vars {*warn-on-reflection* true}
+                   :jvm-opts ^:replace []
+                   :auto-clean false
+                   :prep-tasks [["cljx" "once"] "javac" "compile"]
 
                    :cljx {:builds [{:source-paths ["src"]
                                     :output-path "target/classes"
